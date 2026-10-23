@@ -185,94 +185,83 @@
 </head>
 <body>
 
-    <header>
-        <div class="logo">FOXRAKA HUB</div>
-    </header>
+    <div id="mainUI">
+        <header>
+            <div class="logo">FOXRAKA HUB</div>
+        </header>
 
-    <div class="container">
-        <!-- Form Generator -->
-        <div class="card">
-            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Raw Script</h2>
-            
-            <div class="input-row">
-                <div class="form-group">
-                    <label>Username (Bebas)</label>
-                    <input type="text" id="inputUser" placeholder="Contoh: FoxrakaOwner">
+        <div class="container">
+            <div class="card">
+                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Raw Script Baru</h2>
+                
+                <div class="input-row">
+                    <div class="form-group">
+                        <label>Username (Bebas)</label>
+                        <input type="text" id="inputUser" placeholder="Contoh: FoxrakaOwner">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Repo (Bebas)</label>
+                        <input type="text" id="inputRepo" placeholder="Contoh: AutoFarm">
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Nama Repo (Bebas)</label>
-                    <input type="text" id="inputRepo" placeholder="Contoh: AutoFarm">
+                    <label>Status Visibilitas</label>
+                    <select id="inputVisibility">
+                        <option value="public">Public (Dapat Dilihat & Dieksekusi)</option>
+                        <option value="private">Private (Pesan Privat di Browser, Tetap Bisa Exec)</option>
+                    </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Isi Kode Script Lua</label>
+                    <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB!')"></textarea>
+                </div>
+
+                <button class="btn" onclick="saveScript()">Simpan & Buat Link Loadstring</button>
             </div>
 
-            <div class="form-group">
-                <label>Status Visibilitas Browser</label>
-                <select id="inputVisibility">
-                    <option value="public">Public (Isi Kode Kelihatan di Tab Baru Browser)</option>
-                    <option value="private">Private (Teks Privat di Browser, Tetap Bisa Exec)</option>
-                </select>
+            <div class="card">
+                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Link Raw Script</h2>
+                <div id="scriptList"></div>
             </div>
-
-            <div class="form-group">
-                <label>Isi Kode Script Lua</label>
-                <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB!')"></textarea>
-            </div>
-
-            <button class="btn" onclick="saveScript()">Simpan & Buat Link Loadstring</button>
-        </div>
-
-        <!-- List Script -->
-        <div class="card">
-            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Link Raw Script</h2>
-            <div id="scriptList"></div>
         </div>
     </div>
 
     <div id="toast" class="toast">Copy loadstring berhasil!</div>
 
     <script>
-        // HANDLE LINK SAAT DIBUKA LEWAT BROWSER TAB BARU / EXECUTOR
-        const urlParams = new URLSearchParams(window.location.search);
-        const isRaw = urlParams.get('raw');
+        let scripts = JSON.parse(localStorage.getItem('foxraka_hash_scripts')) || [];
 
-        if (isRaw) {
-            const isPrivate = urlParams.get('priv') === '1';
-            const encodedCode = urlParams.get('code');
-            let code = '';
-            
-            try {
-                code = encodedCode ? decodeURIComponent(atob(encodedCode)) : '';
-            } catch(e) {
-                code = '-- Error decoding script';
+        // ROUTER RAW HANDLER (DIBUKA LEWAT TAB BARU ATAU EXECUTOR)
+        function handleRawRoute() {
+            const hashPath = window.location.hash;
+            if (hashPath.startsWith('#/raw/')) {
+                const parts = hashPath.replace('#/raw/', '').split('/');
+                const scriptId = parts[2];
+
+                const foundScript = scripts.find(s => s.hash === scriptId);
+
+                document.getElementById('mainUI').style.display = 'none';
+                document.body.style.backgroundColor = '#0d1117';
+                document.body.style.color = '#c9d1d9';
+                document.body.style.fontFamily = 'monospace';
+                document.body.style.padding = '20px';
+                document.body.style.whiteSpace = 'pre-wrap';
+                document.body.style.wordBreak = 'break-all';
+
+                if (!foundScript) {
+                    document.body.innerText = "-- 404: Script tidak ditemukan di FOXRAKA HUB";
+                    return;
+                }
+
+                if (foundScript.visibility === 'private') {
+                    document.body.innerText = "Link ini diprivat karena owner tidak mengizinkan siapa pun melihat isi nya";
+                } else {
+                    document.body.innerText = foundScript.code;
+                }
             }
-
-            // Bersihkan tampilan HTML, tampilkan text murni saja
-            document.open();
-            document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>RAW Output - FOXRAKA HUB</title>
-                    <style>
-                        body {
-                            background-color: #0d1117;
-                            color: #c9d1d9;
-                            font-family: monospace;
-                            padding: 20px;
-                            white-space: pre-wrap;
-                            word-break: break-all;
-                        }
-                    </style>
-                </head>
-                <body>${isPrivate ? "Link ini diprivat karena owner tidak mengizinkan siapa pun melihat isi nya" : code}</body>
-                </html>
-            `);
-            document.close();
-            window.stop();
         }
-
-        // MANAGEMENT SCRIPT DASHBOARD
-        let scripts = JSON.parse(localStorage.getItem('foxraka_v2_scripts')) || [];
 
         function generateHash() {
             return Math.random().toString(36).substring(2, 8);
@@ -290,19 +279,16 @@
             }
 
             const hash = generateHash();
-            const encodedCode = btoa(encodeURIComponent(code));
-            
-            // Mengambil URL asli dari halaman GitHub Pages kamu secara otomatis
-            const currentBaseUrl = window.location.href.split('?')[0];
-            const rawUrl = `${currentBaseUrl}?raw=1&u=${user}&r=${repo}&h=${hash}&priv=${visibility === 'private' ? '1' : '0'}&code=${encodedCode}`;
+            const baseUrl = window.location.href.split('#')[0];
+            const rawUrl = `${baseUrl}#/raw/${user}/${repo}/${hash}`;
 
             const newScript = {
                 id: Date.now(),
-                user, repo, hash, visibility, rawUrl
+                user, repo, hash, visibility, code, rawUrl
             };
 
             scripts.unshift(newScript);
-            localStorage.setItem('foxraka_v2_scripts', JSON.stringify(scripts));
+            localStorage.setItem('foxraka_hash_scripts', JSON.stringify(scripts));
             
             document.getElementById('inputCode').value = '';
             renderScripts();
@@ -359,11 +345,13 @@
         function deleteScript(id) {
             if (confirm("Hapus script ini?")) {
                 scripts = scripts.filter(s => s.id !== id);
-                localStorage.setItem('foxraka_v2_scripts', JSON.stringify(scripts));
+                localStorage.setItem('foxraka_hash_scripts', JSON.stringify(scripts));
                 renderScripts();
             }
         }
 
+        window.addEventListener('hashchange', handleRawRoute);
+        handleRawRoute();
         renderScripts();
     </script>
 </body>
