@@ -192,37 +192,37 @@
 
         <div class="container">
             <div class="card">
-                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Raw Script Baru</h2>
+                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Raw Script FOXRAKA HUB</h2>
                 
                 <div class="input-row">
                     <div class="form-group">
                         <label>Username (Bebas)</label>
-                        <input type="text" id="inputUser" placeholder="Contoh: FoxrakaOwner">
+                        <input type="text" id="inputUser" placeholder="Contoh: Foxraka">
                     </div>
                     <div class="form-group">
-                        <label>Nama Repo (Bebas)</label>
-                        <input type="text" id="inputRepo" placeholder="Contoh: AutoFarm">
+                        <label>Nama Repo / Menu (Bebas)</label>
+                        <input type="text" id="inputRepo" placeholder="Contoh: ScriptHub">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Status Visibilitas</label>
                     <select id="inputVisibility">
-                        <option value="public">Public (Dapat Dilihat & Dieksekusi)</option>
-                        <option value="private">Private (Pesan Privat di Browser, Tetap Bisa Exec)</option>
+                        <option value="public">Public (Kelihatan di Browser & Bisa Exec)</option>
+                        <option value="private">Private (Pesan Khusus di Browser, Tetap Bisa Exec)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Isi Kode Script Lua</label>
-                    <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB!')"></textarea>
+                    <textarea id="inputCode" placeholder="print('FOXRAKA HUB Active!')"></textarea>
                 </div>
 
-                <button class="btn" onclick="saveScript()">Simpan & Buat Link Loadstring</button>
+                <button class="btn" onclick="saveScript()">Simpan & Buat Loadstring</button>
             </div>
 
             <div class="card">
-                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Link Raw Script</h2>
+                <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Raw Script FOXRAKA HUB</h2>
                 <div id="scriptList"></div>
             </div>
         </div>
@@ -231,15 +231,13 @@
     <div id="toast" class="toast">Copy loadstring berhasil!</div>
 
     <script>
-        let scripts = JSON.parse(localStorage.getItem('foxraka_hash_scripts')) || [];
+        let scripts = JSON.parse(localStorage.getItem('foxrakahub_final_scripts')) || [];
 
-        // ROUTER RAW HANDLER (DIBUKA LEWAT TAB BARU ATAU EXECUTOR)
         function handleRawRoute() {
             const hashPath = window.location.hash;
             if (hashPath.startsWith('#/raw/')) {
                 const parts = hashPath.replace('#/raw/', '').split('/');
                 const scriptId = parts[2];
-
                 const foundScript = scripts.find(s => s.hash === scriptId);
 
                 document.getElementById('mainUI').style.display = 'none';
@@ -268,8 +266,8 @@
         }
 
         function saveScript() {
-            const user = document.getElementById('inputUser').value.trim() || 'User';
-            const repo = document.getElementById('inputRepo').value.trim().replace(/\s+/g, '-') || 'Repo';
+            const user = document.getElementById('inputUser').value.trim() || 'FOXRAKAHUB';
+            const repo = document.getElementById('inputRepo').value.trim().replace(/\s+/g, '-') || 'Main';
             const visibility = document.getElementById('inputVisibility').value;
             const code = document.getElementById('inputCode').value;
 
@@ -288,7 +286,7 @@
             };
 
             scripts.unshift(newScript);
-            localStorage.setItem('foxraka_hash_scripts', JSON.stringify(scripts));
+            localStorage.setItem('foxrakahub_final_scripts', JSON.stringify(scripts));
             
             document.getElementById('inputCode').value = '';
             renderScripts();
@@ -298,7 +296,7 @@
         function renderScripts() {
             const list = document.getElementById('scriptList');
             if (scripts.length === 0) {
-                list.innerHTML = '<p style="color: var(--text-muted);">Belum ada script yang disimpan.</p>';
+                list.innerHTML = '<p style="color: var(--text-muted);">Belum ada script di FOXRAKA HUB.</p>';
                 return;
             }
 
@@ -315,7 +313,7 @@
                             </span>
                         </div>
                         <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
-                            Commit ID: ${s.hash} | Path: refs/heads/main/main.lua
+                            FOXRAKA HUB ID: ${s.hash}
                         </div>
                         <div class="output-box" id="code-${s.id}">${loadstringCmd}</div>
                         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
@@ -343,9 +341,9 @@
         }
 
         function deleteScript(id) {
-            if (confirm("Hapus script ini?")) {
+            if (confirm("Hapus script dari FOXRAKA HUB?")) {
                 scripts = scripts.filter(s => s.id !== id);
-                localStorage.setItem('foxraka_hash_scripts', JSON.stringify(scripts));
+                localStorage.setItem('foxrakahub_final_scripts', JSON.stringify(scripts));
                 renderScripts();
             }
         }
