@@ -180,7 +180,6 @@
             margin-top: 8px;
         }
 
-        /* Toast / Notification Pop-up */
         .toast {
             visibility: hidden;
             min-width: 250px;
@@ -205,7 +204,6 @@
             opacity: 1;
         }
 
-        /* Modal Overlay */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -244,14 +242,13 @@
     </header>
 
     <div class="container">
-        <!-- Form Buat Script -->
         <div class="card">
             <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Script / Raw Hosting Baru</h2>
             
             <div class="input-row">
                 <div class="form-group">
-                    <label>Username Owner</label>
-                    <input type="text" id="inputUser" placeholder="Masukkan Username...">
+                    <label>Username Owner (GitHub Username)</label>
+                    <input type="text" id="inputUser" placeholder="Masukkan Username GitHub Kamu...">
                 </div>
                 <div class="form-group">
                     <label>Nama Repository</label>
@@ -275,7 +272,6 @@
             <button class="btn" onclick="saveScript()">Simpan & Buat Loadstring Link</button>
         </div>
 
-        <!-- Daftar Script -->
         <div class="card">
             <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Raw Script</h2>
             <div id="scriptList">
@@ -284,10 +280,8 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast">Copy loadstring berhasil!</div>
 
-    <!-- Modal Login -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal">
             <h3 style="margin-bottom: 8px;">Pilih Akun Login</h3>
@@ -374,11 +368,14 @@
                 return;
             }
 
+            // Bersihkan nama repo dari spasi agar tidak merusak URL
+            const cleanRepo = repo.replace(/\s+/g, '-');
             const hashID = generateHash();
+
             const newScript = {
                 id: Date.now(),
                 username: username,
-                repo: repo,
+                repo: cleanRepo,
                 hash: hashID,
                 visibility: visibility,
                 code: code,
@@ -401,7 +398,8 @@
             }
 
             scriptList.innerHTML = scripts.map(s => {
-                const rawUrl = `https://raw.foxrakahubusercontent.com/${s.username}/${s.repo}/${s.hash}/refs/heads/main/main.lua`;
+                // MENGGUNAKAN SERVER RAW ASLI GITHUB AGAR EXECUTE DI EXECUTOR BERHASIL
+                const rawUrl = `https://raw.githubusercontent.com/${s.username}/${s.repo}/refs/heads/main/main.lua`;
                 const loadstringCmd = `loadstring(game:HttpGet("${rawUrl}"))()`;
                 const isPrivate = s.visibility === 'private';
 
@@ -428,7 +426,6 @@
             }).join('');
         }
 
-        // FUNGSI COPY UNIVERSAL (PASTI BERHASIL DI SEMUA BROWSER)
         function copyLoadstring(scriptId) {
             const textToCopy = document.getElementById(`code-${scriptId}`).innerText;
 
