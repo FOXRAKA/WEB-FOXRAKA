@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOXRAKA HUB - Script Host</title>
+    <style>
+        :root {
+            --bg-color: #0f1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-color: #2ea043;
+            --accent-hover: #3fb950;
+            --danger-color: #da3633;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #21262d;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #30363d;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            height: 200px;
+            resize: vertical;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .script-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background-color: var(--code-bg);
+        }
+
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .script-title {
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge-public {
+            color: #3fb950;
+            border-color: #238636;
+        }
+
+        .badge-private {
+            color: #f85149;
+            border-color: #da3633;
+        }
+
+        .output-box {
+            background-color: #010409;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #7ee787;
+            word-break: break-all;
+            margin-top: 8px;
+        }
+
+        /* Toast / Notification Pop-up */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #2ea043;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 12px 16px;
+            position: fixed;
+            z-index: 2000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">FOXRAKA HUB</div>
+        <div class="user-panel" id="authSection">
+            <button class="btn" onclick="openLoginModal()">Login Fast Access</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Form Buat Script -->
+        <div class="card">
+            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Script / Raw Hosting Baru</h2>
+            
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Username Owner</label>
+                    <input type="text" id="inputUser" placeholder="Masukkan Username...">
+                </div>
+                <div class="form-group">
+                    <label>Nama Repository</label>
+                    <input type="text" id="inputRepo" placeholder="Masukkan Nama Repo...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Status Visibilitas</label>
+                <select id="inputVisibility">
+                    <option value="public">Public (Dapat diakses melalui Raw / Loadstring)</option>
+                    <option value="private">Private (Isi Kode Terkunci / Terproteksi)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Isi Kode Lua Script</label>
+                <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB')"></textarea>
+            </div>
+
+            <button class="btn" onclick="saveScript()">Simpan & Buat Loadstring Link</button>
+        </div>
+
+        <!-- Daftar Script -->
+        <div class="card">
+            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Raw Script</h2>
+            <div id="scriptList">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Belum ada script yang disimpan.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Copy loadstring berhasil!</div>
+
+    <!-- Modal Login -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <h3 style="margin-bottom: 8px;">Pilih Akun Login</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Masuk cepat menggunakan akun kamu.</p>
+            
+            <div class="modal-btn-group">
+                <button class="btn btn-secondary" onclick="loginWithAccount('Foxraka User', 'user@foxrakahub.com')">
+                    📧 Masuk sebagai Default User
+                </button>
+                <button class="btn btn-secondary" onclick="promptCustomAccount()">
+                    ✏️ Masuk dengan Email Lain
+                </button>
+                <button class="btn" style="background-color: #333;" onclick="closeLoginModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('foxraka_user')) || null;
+        let scripts = JSON.parse(localStorage.getItem('foxraka_scripts')) || [];
+
+        function initApp() {
+            renderAuth();
+            renderScripts();
+        }
+
+        function renderAuth() {
+            const authSection = document.getElementById('authSection');
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">${currentUser.email}</span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button class="btn" onclick="openLoginModal()">Login Fast Access</button>
+                `;
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function loginWithAccount(name, email) {
+            currentUser = { name, email };
+            localStorage.setItem('foxraka_user', JSON.stringify(currentUser));
+            renderAuth();
+            closeLoginModal();
+            showToast("Berhasil login sebagai " + email);
+        }
+
+        function promptCustomAccount() {
+            const email = prompt("Masukkan Alamat Email Anda:");
+            if (email && email.trim() !== "") {
+                const name = email.split('@')[0];
+                loginWithAccount(name, email);
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('foxraka_user');
+            renderAuth();
+            showToast("Berhasil logout");
+        }
+
+        function generateHash() {
+            return Math.random().toString(36).substring(2, 8);
+        }
+
+        function saveScript() {
+            const username = document.getElementById('inputUser').value.trim();
+            const repo = document.getElementById('inputRepo').value.trim();
+            const visibility = document.getElementById('inputVisibility').value;
+            const code = document.getElementById('inputCode').value;
+
+            if (!username || !repo || !code) {
+                alert("Harap isi Username, Nama Repo, dan Isi Script!");
+                return;
+            }
+
+            const hashID = generateHash();
+            const newScript = {
+                id: Date.now(),
+                username: username,
+                repo: repo,
+                hash: hashID,
+                visibility: visibility,
+                code: code,
+                date: new Date().toLocaleDateString()
+            };
+
+            scripts.unshift(newScript);
+            localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
+
+            document.getElementById('inputCode').value = '';
+            renderScripts();
+            showToast("Script berhasil disimpan!");
+        }
+
+        function renderScripts() {
+            const scriptList = document.getElementById('scriptList');
+            if (scripts.length === 0) {
+                scriptList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Belum ada script yang disimpan.</p>';
+                return;
+            }
+
+            scriptList.innerHTML = scripts.map(s => {
+                const rawUrl = `https://raw.foxrakahubusercontent.com/${s.username}/${s.repo}/${s.hash}/refs/heads/main/main.lua`;
+                const loadstringCmd = `loadstring(game:HttpGet("${rawUrl}"))()`;
+                const isPrivate = s.visibility === 'private';
+
+                return `
+                    <div class="script-item">
+                        <div class="script-header">
+                            <span class="script-title">${s.username} / ${s.repo}</span>
+                            <span class="badge ${isPrivate ? 'badge-private' : 'badge-public'}">
+                                ${isPrivate ? 'Private' : 'Public'}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                            Commit ID: ${s.hash} | Path: refs/heads/main/main.lua
+                        </div>
+                        <div class="output-box" id="code-${s.id}">${loadstringCmd}</div>
+                        <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="copyLoadstring('${s.id}')">Copy Loadstring</button>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="viewRaw(${s.id})">Test Raw Output</button>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="toggleVisibility(${s.id})">Toggle Public/Private</button>
+                            <button class="btn" style="font-size: 0.75rem; background-color: var(--danger-color);" onclick="deleteScript(${s.id})">Hapus</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // FUNGSI COPY UNIVERSAL (PASTI BERHASIL DI SEMUA BROWSER)
+        function copyLoadstring(scriptId) {
+            const textToCopy = document.getElementById(`code-${scriptId}`).innerText;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast("Copy loadstring berhasil!");
+                }).catch(() => {
+                    fallbackCopyText(textToCopy);
+                });
+            } else {
+                fallbackCopyText(textToCopy);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showToast("Copy loadstring berhasil!");
+            } catch (err) {
+                alert("Gagal menyalin teks. Silakan salin secara manual.");
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+
+        function viewRaw(id) {
+            const script = scripts.find(s => s.id === id);
+            if (!script) return;
+
+            if (script.visibility === 'private') {
+                alert("Link ini diprivat karena owner tidak mengizinkan siapa pun melihat isi nya");
+            } else {
+                alert("--- RAW OUTPUT (Content-Type: text/plain) ---\n\n" + script.code);
+            }
+        }
+
+        function toggleVisibility(id) {
+            scripts = scripts.map(s => {
+                if (s.id === id) {
+                    s.visibility = s.visibility === 'public' ? 'private' : 'public';
+                }
+                return s;
+            });
+            localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
+            renderScripts();
+            showToast("Status visibilitas diperbarui!");
+        }
+
+        function deleteScript(id) {
+            if (confirm("Yakin ingin menghapus script ini?")) {
+                scripts = scripts.filter(s => s.id !== id);
+                localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
+                renderScripts();
+                showToast("Script berhasil dihapus!");
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
