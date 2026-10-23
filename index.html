@@ -21,15 +21,15 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
 
         header {
@@ -48,43 +48,8 @@
             letter-spacing: 1px;
         }
 
-        .user-panel {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-secondary {
-            background-color: #21262d;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: #30363d;
-        }
-
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             width: 100%;
             margin: 32px auto;
             padding: 0 16px;
@@ -93,7 +58,7 @@
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
         }
@@ -120,8 +85,8 @@
         }
 
         textarea {
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            height: 200px;
+            font-family: monospace;
+            height: 180px;
             resize: vertical;
         }
 
@@ -131,11 +96,32 @@
             gap: 16px;
         }
 
+        .btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: #21262d;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
         .script-item {
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             background-color: var(--code-bg);
         }
 
@@ -158,15 +144,8 @@
             border: 1px solid var(--border-color);
         }
 
-        .badge-public {
-            color: #3fb950;
-            border-color: #238636;
-        }
-
-        .badge-private {
-            color: #f85149;
-            border-color: #da3633;
-        }
+        .badge-public { color: #3fb950; border-color: #238636; }
+        .badge-private { color: #f85149; border-color: #da3633; }
 
         .output-box {
             background-color: #010409;
@@ -187,226 +166,150 @@
             color: #fff;
             text-align: center;
             border-radius: 6px;
-            padding: 12px 16px;
+            padding: 12px;
             position: fixed;
             z-index: 2000;
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             opacity: 0;
             transition: opacity 0.3s, visibility 0.3s;
         }
 
-        .toast.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .modal-btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .toast.show { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">FOXRAKA HUB</div>
-        <div class="user-panel" id="authSection">
-            <button class="btn" onclick="openLoginModal()">Login Fast Access</button>
-        </div>
     </header>
 
     <div class="container">
+        <!-- Form Generator -->
         <div class="card">
-            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Script / Raw Hosting Baru</h2>
+            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Buat Raw Script</h2>
             
             <div class="input-row">
                 <div class="form-group">
-                    <label>Username Owner (GitHub Username)</label>
-                    <input type="text" id="inputUser" placeholder="Masukkan Username GitHub Kamu...">
+                    <label>Username (Bebas)</label>
+                    <input type="text" id="inputUser" placeholder="Contoh: FoxrakaOwner">
                 </div>
                 <div class="form-group">
-                    <label>Nama Repository</label>
-                    <input type="text" id="inputRepo" placeholder="Masukkan Nama Repo...">
+                    <label>Nama Repo (Bebas)</label>
+                    <input type="text" id="inputRepo" placeholder="Contoh: AutoFarm">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Status Visibilitas</label>
+                <label>Status Visibilitas Browser</label>
                 <select id="inputVisibility">
-                    <option value="public">Public (Dapat diakses melalui Raw / Loadstring)</option>
-                    <option value="private">Private (Isi Kode Terkunci / Terproteksi)</option>
+                    <option value="public">Public (Isi Script Kelihatan di Browser)</option>
+                    <option value="private">Private (Pesan Privat di Browser, Tetap Bisa Exec)</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Isi Kode Lua Script</label>
-                <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB')"></textarea>
+                <label>Isi Kode Script Lua</label>
+                <textarea id="inputCode" placeholder="print('Hello World from FOXRAKA HUB!')"></textarea>
             </div>
 
-            <button class="btn" onclick="saveScript()">Simpan & Buat Loadstring Link</button>
+            <button class="btn" onclick="saveScript()">Simpan & Buat Link Loadstring</button>
         </div>
 
+        <!-- List Script -->
         <div class="card">
-            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Raw Script</h2>
-            <div id="scriptList">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Belum ada script yang disimpan.</p>
-            </div>
+            <h2 style="margin-bottom: 16px; font-size: 1.1rem;">Daftar Link Raw Script</h2>
+            <div id="scriptList"></div>
         </div>
     </div>
 
     <div id="toast" class="toast">Copy loadstring berhasil!</div>
 
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal">
-            <h3 style="margin-bottom: 8px;">Pilih Akun Login</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Masuk cepat menggunakan akun kamu.</p>
-            
-            <div class="modal-btn-group">
-                <button class="btn btn-secondary" onclick="loginWithAccount('Foxraka User', 'user@foxrakahub.com')">
-                    📧 Masuk sebagai Default User
-                </button>
-                <button class="btn btn-secondary" onclick="promptCustomAccount()">
-                    ✏️ Masuk dengan Email Lain
-                </button>
-                <button class="btn" style="background-color: #333;" onclick="closeLoginModal()">Batal</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('foxraka_user')) || null;
-        let scripts = JSON.parse(localStorage.getItem('foxraka_scripts')) || [];
+        // HALAMAN PENANGANAN JIKA DIBUKA LEWAT LINK RAW
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawMode = urlParams.get('raw');
+        
+        if (rawMode) {
+            const isPrivate = urlParams.get('priv') === '1';
+            const encodedCode = urlParams.get('code');
+            const code = encodedCode ? decodeURIComponent(atob(encodedCode)) : '';
 
-        function initApp() {
-            renderAuth();
-            renderScripts();
-        }
+            // CEK APAKAH DIBUKA OLEH EXECUTOR ROBLOX ATAU BROWSER USER
+            const userAgent = navigator.userAgent || '';
+            const isExecutor = userAgent.includes('Roblox') || userAgent.includes('HTTP') || !userAgent.includes('Mozilla');
 
-        function renderAuth() {
-            const authSection = document.getElementById('authSection');
-            if (currentUser) {
-                authSection.innerHTML = `
-                    <span style="font-size: 0.85rem; color: var(--text-muted);">${currentUser.email}</span>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
-                `;
+            document.body.style.backgroundColor = '#0d1117';
+            document.body.style.color = '#c9d1d9';
+            document.body.style.fontFamily = 'monospace';
+            document.body.style.padding = '20px';
+            document.body.style.whiteSpace = 'pre-wrap';
+
+            if (isPrivate && !isExecutor) {
+                // Tampilan jika dibuka di Browser HP/Laptop biasa dan status Private
+                document.body.innerText = "Link ini diprivat karena owner tidak mengizinkan siapa pun melihat isi nya";
             } else {
-                authSection.innerHTML = `
-                    <button class="btn" onclick="openLoginModal()">Login Fast Access</button>
-                `;
+                // Tampilan jika Public atau jika dipanggil oleh Executor (Solara)
+                document.body.innerText = code;
             }
+            window.stop();
         }
 
-        function openLoginModal() {
-            document.getElementById('loginModal').style.display = 'flex';
-        }
-
-        function closeLoginModal() {
-            document.getElementById('loginModal').style.display = 'none';
-        }
-
-        function loginWithAccount(name, email) {
-            currentUser = { name, email };
-            localStorage.setItem('foxraka_user', JSON.stringify(currentUser));
-            renderAuth();
-            closeLoginModal();
-            showToast("Berhasil login sebagai " + email);
-        }
-
-        function promptCustomAccount() {
-            const email = prompt("Masukkan Alamat Email Anda:");
-            if (email && email.trim() !== "") {
-                const name = email.split('@')[0];
-                loginWithAccount(name, email);
-            }
-        }
-
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('foxraka_user');
-            renderAuth();
-            showToast("Berhasil logout");
-        }
+        // JS LOGIC DASHBOARD WEB
+        let scripts = JSON.parse(localStorage.getItem('foxraka_simple_scripts')) || [];
 
         function generateHash() {
             return Math.random().toString(36).substring(2, 8);
         }
 
         function saveScript() {
-            const username = document.getElementById('inputUser').value.trim();
-            const repo = document.getElementById('inputRepo').value.trim();
+            const user = document.getElementById('inputUser').value.trim() || 'User';
+            const repo = document.getElementById('inputRepo').value.trim().replace(/\s+/g, '-') || 'Repo';
             const visibility = document.getElementById('inputVisibility').value;
             const code = document.getElementById('inputCode').value;
 
-            if (!username || !repo || !code) {
-                alert("Harap isi Username, Nama Repo, dan Isi Script!");
+            if (!code) {
+                alert("Isi kode Lua script tidak boleh kosong!");
                 return;
             }
 
-            // Bersihkan nama repo dari spasi agar tidak merusak URL
-            const cleanRepo = repo.replace(/\s+/g, '-');
-            const hashID = generateHash();
+            const hash = generateHash();
+            const encodedCode = btoa(encodeURIComponent(code));
+            
+            // Menggunakan lokasi URL web saat ini
+            const baseUrl = window.location.href.split('?')[0];
+            const rawUrl = `${baseUrl}?raw=1&user=${user}&repo=${repo}&hash=${hash}&priv=${visibility === 'private' ? '1' : '0'}&code=${encodedCode}`;
 
             const newScript = {
                 id: Date.now(),
-                username: username,
-                repo: cleanRepo,
-                hash: hashID,
-                visibility: visibility,
-                code: code,
-                date: new Date().toLocaleDateString()
+                user, repo, hash, visibility, rawUrl
             };
 
             scripts.unshift(newScript);
-            localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
-
+            localStorage.setItem('foxraka_simple_scripts', JSON.stringify(scripts));
+            
             document.getElementById('inputCode').value = '';
             renderScripts();
             showToast("Script berhasil disimpan!");
         }
 
         function renderScripts() {
-            const scriptList = document.getElementById('scriptList');
+            const list = document.getElementById('scriptList');
             if (scripts.length === 0) {
-                scriptList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Belum ada script yang disimpan.</p>';
+                list.innerHTML = '<p style="color: var(--text-muted);">Belum ada script yang disimpan.</p>';
                 return;
             }
 
-            scriptList.innerHTML = scripts.map(s => {
-                // MENGGUNAKAN SERVER RAW ASLI GITHUB AGAR EXECUTE DI EXECUTOR BERHASIL
-                const rawUrl = `https://raw.githubusercontent.com/${s.username}/${s.repo}/refs/heads/main/main.lua`;
-                const loadstringCmd = `loadstring(game:HttpGet("${rawUrl}"))()`;
+            list.innerHTML = scripts.map(s => {
+                const loadstringCmd = `loadstring(game:HttpGet("${s.rawUrl}"))()`;
                 const isPrivate = s.visibility === 'private';
 
                 return `
                     <div class="script-item">
                         <div class="script-header">
-                            <span class="script-title">${s.username} / ${s.repo}</span>
+                            <span class="script-title">${s.user} / ${s.repo}</span>
                             <span class="badge ${isPrivate ? 'badge-private' : 'badge-public'}">
                                 ${isPrivate ? 'Private' : 'Public'}
                             </span>
@@ -416,9 +319,8 @@
                         </div>
                         <div class="output-box" id="code-${s.id}">${loadstringCmd}</div>
                         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="copyLoadstring('${s.id}')">Copy Loadstring</button>
-                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="viewRaw(${s.id})">Test Raw Output</button>
-                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="toggleVisibility(${s.id})">Toggle Public/Private</button>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem;" onclick="copyText('${s.id}')">Copy Loadstring</button>
+                            <a href="${s.rawUrl}" target="_blank" class="btn btn-secondary" style="font-size: 0.75rem; text-decoration: none;">Buka Raw Link</a>
                             <button class="btn" style="font-size: 0.75rem; background-color: var(--danger-color);" onclick="deleteScript(${s.id})">Hapus</button>
                         </div>
                     </div>
@@ -426,82 +328,29 @@
             }).join('');
         }
 
-        function copyLoadstring(scriptId) {
-            const textToCopy = document.getElementById(`code-${scriptId}`).innerText;
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    showToast("Copy loadstring berhasil!");
-                }).catch(() => {
-                    fallbackCopyText(textToCopy);
-                });
-            } else {
-                fallbackCopyText(textToCopy);
-            }
-        }
-
-        function fallbackCopyText(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            textArea.style.top = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-
-            try {
-                document.execCommand('copy');
+        function copyText(id) {
+            const text = document.getElementById(`code-${id}`).innerText;
+            navigator.clipboard.writeText(text).then(() => {
                 showToast("Copy loadstring berhasil!");
-            } catch (err) {
-                alert("Gagal menyalin teks. Silakan salin secara manual.");
-            }
-
-            document.body.removeChild(textArea);
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.classList.add("show");
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 2500);
-        }
-
-        function viewRaw(id) {
-            const script = scripts.find(s => s.id === id);
-            if (!script) return;
-
-            if (script.visibility === 'private') {
-                alert("Link ini diprivat karena owner tidak mengizinkan siapa pun melihat isi nya");
-            } else {
-                alert("--- RAW OUTPUT (Content-Type: text/plain) ---\n\n" + script.code);
-            }
-        }
-
-        function toggleVisibility(id) {
-            scripts = scripts.map(s => {
-                if (s.id === id) {
-                    s.visibility = s.visibility === 'public' ? 'private' : 'public';
-                }
-                return s;
             });
-            localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
-            renderScripts();
-            showToast("Status visibilitas diperbarui!");
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 2000);
         }
 
         function deleteScript(id) {
-            if (confirm("Yakin ingin menghapus script ini?")) {
+            if (confirm("Hapus script ini?")) {
                 scripts = scripts.filter(s => s.id !== id);
-                localStorage.setItem('foxraka_scripts', JSON.stringify(scripts));
+                localStorage.setItem('foxraka_simple_scripts', JSON.stringify(scripts));
                 renderScripts();
-                showToast("Script berhasil dihapus!");
             }
         }
 
-        initApp();
+        renderScripts();
     </script>
 </body>
 </html>
